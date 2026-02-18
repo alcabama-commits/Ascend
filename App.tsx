@@ -119,6 +119,46 @@ const App: React.FC = () => {
     }
   };
 
+  const handleDownloadCSV = () => {
+    const weights: Record<string, number> = { p1: 0.3, p2: 0.3, final: 0.4 };
+    const header = ['id','name','project', ...BIM_DELIVERIES.map(s => s.id), 'participationBonus','promedio','comment'];
+    const escape = (v: any) => `"${String(v ?? '').replace(/"/g, '""')}"`;
+    const rows = students.map(st => {
+      let total = 0;
+      let sum = 0;
+      BIM_DELIVERIES.forEach(s => {
+        const w = weights[s.id] ?? 0;
+        if (!w) return;
+        const g = st.grades[s.id] ?? 0;
+        total += g * w;
+        sum += w;
+      });
+      const base = sum ? total / sum : 0;
+      const bonus = st.participationBonus ?? 0;
+      const avg = Math.min(5, base + bonus);
+      const cols = [
+        st.id,
+        st.name,
+        st.project,
+        ...BIM_DELIVERIES.map(s => st.grades[s.id] ?? 0),
+        (st.participationBonus ?? 0).toFixed(1),
+        avg.toFixed(1),
+        st.comment ?? ''
+      ];
+      return cols.map(escape).join(',');
+    });
+    const csv = [header.join(','), ...rows].join('\n');
+    const blob = new Blob([csv], { type: 'text/csv;charset=utf-8;' });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = 'registro-calificaciones.csv';
+    document.body.appendChild(a);
+    a.click();
+    document.body.removeChild(a);
+    URL.revokeObjectURL(url);
+  };
+
   if (isLoading) {
     return (
       <div className="min-h-screen flex flex-col justify-center items-center bg-[#020617] text-slate-200">
@@ -189,16 +229,23 @@ const App: React.FC = () => {
             />
           </div>
 
-          {/* Botón de Subir notas (solo en Administración) */}
           {activeTab === 'table' && (
-            <button 
-              onClick={handleSaveToCloud}
-              disabled={isSaving}
-              className="flex items-center gap-2 px-4 py-3 bg-yellow-500 text-black rounded-2xl hover:bg-yellow-400 transition-all text-sm font-bold shadow-lg shadow-yellow-500/20 disabled:opacity-50 disabled:cursor-not-allowed"
-            >
-              {isSaving ? <Loader2 className="w-4 h-4 animate-spin" /> : <Save className="w-4 h-4" />}
-              <span>{isSaving ? 'Subiendo...' : 'Subir notas'}</span>
-            </button>
+            <div className="flex items-center gap-3">
+              <button 
+                onClick={handleSaveToCloud}
+                disabled={isSaving}
+                className="flex items-center gap-2 px-4 py-3 bg-yellow-500 text-black rounded-2xl hover:bg-yellow-400 transition-all text-sm font-bold shadow-lg shadow-yellow-500/20 disabled:opacity-50 disabled:cursor-not-allowed"
+              >
+                {isSaving ? <Loader2 className="w-4 h-4 animate-spin" /> : <Save className="w-4 h-4" />}
+                <span>{isSaving ? 'Subiendo...' : 'Subir notas'}</span>
+              </button>
+              <button 
+                onClick={handleDownloadCSV}
+                className="flex items-center gap-2 px-4 py-3 bg-blue-500 text-white rounded-2xl hover:bg-blue-600 transition-all text-sm font-bold shadow-lg shadow-blue-500/20"
+              >
+                <span>Descargar CSV</span>
+              </button>
+            </div>
           )}
 
           {activeTab !== 'student' && (
