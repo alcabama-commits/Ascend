@@ -3,7 +3,12 @@ import { GoogleGenAI } from "@google/genai";
 import { Student, Subject } from "../types";
 
 export const getAIInsights = async (student: Student, subjects: Subject[]) => {
-  const ai = new GoogleGenAI({ apiKey: process.env.API_KEY });
+  const apiKey = (process.env.GEMINI_API_KEY as string) || (process.env.API_KEY as string);
+  if (!apiKey) {
+    return "Mentor IA no está configurado. Pide al docente que defina la GEMINI_API_KEY antes de usar esta función.";
+  }
+
+  const ai = new GoogleGenAI({ apiKey });
   
   const gradesList = subjects.map(s => `${s.name}: ${student.grades[s.id] || 0.0}`).join(', ');
   
@@ -24,11 +29,14 @@ export const getAIInsights = async (student: Student, subjects: Subject[]) => {
   `;
 
   try {
-    const response = await ai.models.generateContent({
+    const response: any = await ai.models.generateContent({
       model: "gemini-3-pro-preview",
       contents: prompt,
     });
-    return response.text;
+    if (typeof response.text === 'function') {
+      return response.text();
+    }
+    return String(response.text ?? '');
   } catch (error) {
     console.error("Error AI:", error);
     return "No pudimos generar el análisis técnico. Revisa la conexión.";
@@ -36,7 +44,12 @@ export const getAIInsights = async (student: Student, subjects: Subject[]) => {
 };
 
 export const getClassReport = async (students: Student[], subjects: Subject[]) => {
-  const ai = new GoogleGenAI({ apiKey: process.env.API_KEY });
+  const apiKey = (process.env.GEMINI_API_KEY as string) || (process.env.API_KEY as string);
+  if (!apiKey) {
+    return "Mentor IA no está configurado. Pide al docente que defina la GEMINI_API_KEY antes de usar esta función.";
+  }
+
+  const ai = new GoogleGenAI({ apiKey });
   
   const dataSummary = students.map(st => {
     const grades = subjects.map(s => `${s.name}: ${st.grades[s.id] || 0.0}`).join(', ');
@@ -54,11 +67,14 @@ export const getClassReport = async (students: Student[], subjects: Subject[]) =
   `;
 
   try {
-    const response = await ai.models.generateContent({
+    const response: any = await ai.models.generateContent({
       model: "gemini-3-pro-preview",
       contents: prompt,
     });
-    return response.text;
+    if (typeof response.text === 'function') {
+      return response.text();
+    }
+    return String(response.text ?? '');
   } catch (error) {
     return "Error al procesar el reporte grupal.";
   }

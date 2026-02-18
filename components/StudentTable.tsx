@@ -22,10 +22,33 @@ const StudentTable: React.FC<StudentTableProps> = ({ students, subjects, onUpdat
     }
   };
 
-  const calculateAverage = (grades: Record<string, number>): string => {
-    const values = Object.values(grades);
-    if (values.length === 0) return "0.0";
-    return (values.reduce((a: number, b: number) => a + b, 0) / values.length).toFixed(1);
+  const calculateAverage = (student: Student, subjects: Subject[]): string => {
+    const WEIGHTS: Record<string, number> = {
+      p1: 0.3,
+      p2: 0.3,
+      final: 0.4
+    };
+
+    let total = 0;
+    let weightSum = 0;
+
+    subjects.forEach(subject => {
+      const weight = WEIGHTS[subject.id] ?? 0;
+      if (weight === 0) return;
+
+      let grade = student.grades[subject.id] ?? 0;
+
+      if (subject.id === 'final') {
+        const bonus = student.participationBonus ?? 0;
+        grade = Math.min(5.0, grade + bonus);
+      }
+
+      total += grade * weight;
+      weightSum += weight;
+    });
+
+    if (weightSum === 0) return "0.0";
+    return (total / weightSum).toFixed(1);
   };
 
   return (
@@ -40,13 +63,14 @@ const StudentTable: React.FC<StudentTableProps> = ({ students, subjects, onUpdat
                   {subject.name}
                 </th>
               ))}
+              <th className="px-6 py-5 text-[10px] font-black text-slate-500 uppercase tracking-[0.2em] text-center">Participación</th>
               <th className="px-6 py-5 text-[10px] font-black text-slate-500 uppercase tracking-[0.2em] text-center">Promedio</th>
               <th className="px-6 py-5 text-right"></th>
             </tr>
           </thead>
           <tbody className="divide-y divide-slate-800/50">
             {students.map(student => {
-              const avg = parseFloat(calculateAverage(student.grades));
+              const avg = parseFloat(calculateAverage(student, subjects));
               return (
                 <tr key={student.id} className="group hover:bg-white/[0.02] transition-colors">
                   <td className="px-6 py-5">
@@ -98,6 +122,27 @@ const StudentTable: React.FC<StudentTableProps> = ({ students, subjects, onUpdat
                     </td>
                   ))}
                   <td className="px-6 py-5 text-center">
+                    {readOnly ? (
+                      <span className="inline-flex items-center justify-center w-16 h-10 rounded-2xl text-xs font-bold border border-slate-700/50 bg-slate-800/50">
+                        {(student.participationBonus ?? 0).toFixed(1)}
+                      </span>
+                    ) : (
+                      <input
+                        type="number"
+                        step="0.1"
+                        min="0"
+                        max="1"
+                        className="w-16 px-1 py-2 text-center bg-slate-800/50 border border-slate-700/50 rounded-xl text-xs font-bold text-white focus:ring-2 focus:ring-indigo-500 outline-none"
+                        value={student.participationBonus ?? 0}
+                        onChange={(e) => {
+                          const raw = parseFloat(e.target.value) || 0;
+                          const clamped = Math.max(0, Math.min(1, raw));
+                          onUpdate(student.id, { participationBonus: clamped });
+                        }}
+                      />
+                    )}
+                  </td>
+                  <td className="px-6 py-5 text-center">
                     <span className={`inline-flex items-center justify-center w-12 h-12 rounded-2xl text-xs font-black border ${
                       avg >= 4.5 
                         ? 'bg-green-500/20 text-green-400 border-green-500/30' 
@@ -105,7 +150,7 @@ const StudentTable: React.FC<StudentTableProps> = ({ students, subjects, onUpdat
                           ? 'bg-yellow-500/20 text-yellow-400 border-yellow-500/30'
                           : 'bg-red-500/20 text-red-400 border-red-500/30'
                     }`}>
-                      {calculateAverage(student.grades)}
+                      {calculateAverage(student, subjects)}
                     </span>
                   </td>
                   <td className="px-6 py-5 text-right">

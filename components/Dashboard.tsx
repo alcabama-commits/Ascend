@@ -24,6 +24,34 @@ interface DashboardProps {
 const NEON_COLORS = ['#38bdf8', '#a855f7', '#f97316', '#ef4444'];
 
 const Dashboard: React.FC<DashboardProps> = ({ students, subjects }) => {
+  const getStudentAverage = (student: Student): number => {
+    const WEIGHTS: Record<string, number> = {
+      p1: 0.3,
+      p2: 0.3,
+      final: 0.4
+    };
+
+    let total = 0;
+    let weightSum = 0;
+
+    subjects.forEach(subject => {
+      const weight = WEIGHTS[subject.id] ?? 0;
+      if (weight === 0) return;
+
+      let grade = student.grades[subject.id] ?? 0;
+      if (subject.id === 'final') {
+        const bonus = student.participationBonus ?? 0;
+        grade = Math.min(5.0, grade + bonus);
+      }
+
+      total += grade * weight;
+      weightSum += weight;
+    });
+
+    if (weightSum === 0) return 0;
+    return total / weightSum;
+  };
+
   const chartData = useMemo(() => {
     return subjects.map(subject => {
       const avg = students.length > 0
@@ -39,8 +67,7 @@ const Dashboard: React.FC<DashboardProps> = ({ students, subjects }) => {
   const distributionData = useMemo(() => {
     const counts = { excellent: 0, good: 0, basic: 0, low: 0 };
     students.forEach(st => {
-      const totalScore = subjects.reduce((sum, sub) => sum + (st.grades[sub.id] || 0), 0);
-      const avg = subjects.length > 0 ? totalScore / subjects.length : 0;
+      const avg = getStudentAverage(st);
       if (avg >= 4.5) counts.excellent++;
       else if (avg >= 3.5) counts.good++;
       else if (avg >= 3.0) counts.basic++;
@@ -57,13 +84,11 @@ const Dashboard: React.FC<DashboardProps> = ({ students, subjects }) => {
   const stats = useMemo(() => {
     if (students.length === 0) return null;
     const allAverages = students.map(st => {
-      const totalScore = subjects.reduce((sum, sub) => sum + (st.grades[sub.id] || 0), 0);
-      return subjects.length > 0 ? totalScore / subjects.length : 0;
+      return getStudentAverage(st);
     });
     const globalAvg = allAverages.reduce((a: number, b: number) => a + b, 0) / students.length;
     const topStudent = students.reduce((prev, curr) => {
-        const getAvg = (s: Student) => subjects.reduce((sum, sub) => sum + (s.grades[sub.id] || 0), 0) / subjects.length;
-        return (getAvg(curr) > getAvg(prev)) ? curr : prev;
+        return (getStudentAverage(curr) > getStudentAverage(prev)) ? curr : prev;
     });
 
     return {
@@ -86,7 +111,7 @@ const Dashboard: React.FC<DashboardProps> = ({ students, subjects }) => {
         />
         <StatCard 
           icon={<Target className="w-6 h-6 text-orange-400" />} 
-          label="Líder del Grupo" 
+          label="Mejor promedio" 
           value={stats.topPerformer.split(' ')[0]} 
           subtext={stats.topPerformer}
         />

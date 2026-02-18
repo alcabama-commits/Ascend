@@ -4,6 +4,7 @@ export interface Student {
   name: string;
   project: string;
   grades: Record<string, number>; // subjectId -> score
+  participationBonus?: number;
   aiFeedback?: string;
 }
 

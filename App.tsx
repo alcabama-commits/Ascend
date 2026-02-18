@@ -21,17 +21,17 @@ const BIM_DELIVERIES: Subject[] = [
 ];
 
 const INITIAL_STUDENTS: Student[] = [
-  { id: '1', name: 'Yenifer Tatiana Arias Coca', project: 'Casa AF / Arquipélago Arquitetos', grades: { p1: 4.2, p2: 4.0, final: 4.5 } },
-  { id: '2', name: 'Camilo Andres Miranda Gomez', project: 'Casa AF / Arquipélago Arquitetos', grades: { p1: 3.8, p2: 3.5, final: 4.0 } },
-  { id: '3', name: 'Andres Felipe Posso Garcia', project: 'Casa Salatino / Sommet', grades: { p1: 4.5, p2: 4.2, final: 4.8 } },
-  { id: '4', name: 'Carlos Mario Dagua Palco', project: 'Casa Salatino / Sommet', grades: { p1: 3.2, p2: 3.8, final: 3.5 } },
-  { id: '5', name: 'James Andres Marin Rojas', project: 'Casa al cuadrado / Estudi La Caseta', grades: { p1: 4.8, p2: 4.9, final: 5.0 } },
-  { id: '6', name: 'Alvaro Andres Rodriguez Espinel', project: 'Pendiente de asignar', grades: { p1: 2.5, p2: 2.8, final: 3.0 } },
-  { id: '7', name: 'Karol Andrea Forero Herrera', project: 'Casa Salatino / Sommet', grades: { p1: 4.0, p2: 4.2, final: 4.3 } },
-  { id: '8', name: 'Alejandra Rueda Castro', project: 'Casa Jungla / FAMM Arquitectura', grades: { p1: 4.9, p2: 4.8, final: 5.0 } },
-  { id: '9', name: 'Julian Santiago Gonzalez Pirazan', project: 'Pendiente de asignar', grades: { p1: 3.0, p2: 3.2, final: 3.5 } },
-  { id: '10', name: 'Alejandra Lopez Arrubla', project: 'Casa Jungla / FAMM Arquitectura', grades: { p1: 4.1, p2: 4.3, final: 4.5 } },
-  { id: '11', name: 'Juan Felipe Diaz Martinez', project: 'Casa Jungla / FAMM Arquitectura', grades: { p1: 3.9, p2: 4.0, final: 4.2 } },
+  { id: '1', name: 'Yenifer Tatiana Arias Coca', project: 'Casa AF / Arquipélago Arquitetos', grades: { p1: 4.2, p2: 4.0, final: 4.5 }, participationBonus: 0 },
+  { id: '2', name: 'Camilo Andres Miranda Gomez', project: 'Casa AF / Arquipélago Arquitetos', grades: { p1: 3.8, p2: 3.5, final: 4.0 }, participationBonus: 0 },
+  { id: '3', name: 'Andres Felipe Posso Garcia', project: 'Casa Salatino / Sommet', grades: { p1: 4.5, p2: 4.2, final: 4.8 }, participationBonus: 0 },
+  { id: '4', name: 'Carlos Mario Dagua Palco', project: 'Casa Salatino / Sommet', grades: { p1: 3.2, p2: 3.8, final: 3.5 }, participationBonus: 0 },
+  { id: '5', name: 'James Andres Marin Rojas', project: 'Casa al cuadrado / Estudi La Caseta', grades: { p1: 4.8, p2: 4.9, final: 5.0 }, participationBonus: 0 },
+  { id: '6', name: 'Alvaro Andres Rodriguez Espinel', project: 'Pendiente de asignar', grades: { p1: 2.5, p2: 2.8, final: 3.0 }, participationBonus: 0 },
+  { id: '7', name: 'Karol Andrea Forero Herrera', project: 'Casa Salatino / Sommet', grades: { p1: 4.0, p2: 4.2, final: 4.3 }, participationBonus: 0 },
+  { id: '8', name: 'Alejandra Rueda Castro', project: 'Casa Jungla / FAMM Arquitectura', grades: { p1: 4.9, p2: 4.8, final: 5.0 }, participationBonus: 0 },
+  { id: '9', name: 'Julian Santiago Gonzalez Pirazan', project: 'Pendiente de asignar', grades: { p1: 3.0, p2: 3.2, final: 3.5 }, participationBonus: 0 },
+  { id: '10', name: 'Alejandra Lopez Arrubla', project: 'Casa Jungla / FAMM Arquitectura', grades: { p1: 4.1, p2: 4.3, final: 4.5 }, participationBonus: 0 },
+  { id: '11', name: 'Juan Felipe Diaz Martinez', project: 'Casa Jungla / FAMM Arquitectura', grades: { p1: 3.9, p2: 4.0, final: 4.2 }, participationBonus: 0 },
 ];
 
 type Tab = 'student' | 'table' | 'dashboard' | 'ai';
@@ -92,9 +92,8 @@ const App: React.FC = () => {
             <img 
               src="https://i.postimg.cc/dVHkY36j/logo-ascend-dark.png" 
               alt="Ascend Logo" 
-              className="w-full h-auto max-w-[180px] mb-2"
+              className="w-full h-auto max-w-[180px]"
             />
-            <p className="text-[10px] font-bold uppercase tracking-[0.2em] text-indigo-400">Dream it, we BIM it</p>
           </div>
         </div>
 
@@ -126,15 +125,7 @@ const App: React.FC = () => {
           />
         </nav>
 
-        <div className="p-6 border-t border-slate-800/50 flex flex-col gap-4">
-          <div className="flex justify-between items-center text-[10px] font-bold text-slate-500 uppercase">
-            <span>Certificaciones</span>
-          </div>
-          <div className="flex gap-3 grayscale opacity-30 hover:grayscale-0 hover:opacity-100 transition-all cursor-default">
-             <div className="bg-white/5 p-2 rounded border border-white/10 text-[8px] font-bold">AUTODESK</div>
-             <div className="bg-white/5 p-2 rounded border border-white/10 text-[8px] font-bold">BIM FORUM</div>
-          </div>
-        </div>
+        <div className="p-6 border-t border-slate-800/50 flex flex-col gap-4"></div>
       </aside>
 
       {/* Main Content */}
@@ -165,10 +156,6 @@ const App: React.FC = () => {
         <div className="p-8 max-w-7xl mx-auto w-full">
           {activeTab === 'student' && (
             <div className="animate-in fade-in duration-500">
-              <div className="mb-8">
-                <h2 className="text-3xl font-extrabold text-white tracking-tight">Vista de estudiantes</h2>
-                <p className="text-slate-500 mt-1">Consulta de calificaciones en modo solo lectura.</p>
-              </div>
               <StudentTable 
                 students={filteredStudents} 
                 subjects={BIM_DELIVERIES} 
