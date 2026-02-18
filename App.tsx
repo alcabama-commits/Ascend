@@ -24,17 +24,17 @@ const BIM_DELIVERIES: Subject[] = [
 ];
 
 const INITIAL_STUDENTS: Student[] = [
-  { id: '1', name: 'Yenifer Tatiana Arias Coca', project: 'Casa AF / Arquipélago Arquitetos', grades: { p1: 4.2, p2: 4.0, final: 4.5 }, participationBonus: 0 },
-  { id: '2', name: 'Camilo Andres Miranda Gomez', project: 'Casa AF / Arquipélago Arquitetos', grades: { p1: 3.8, p2: 3.5, final: 4.0 }, participationBonus: 0 },
-  { id: '3', name: 'Andres Felipe Posso Garcia', project: 'Casa Salatino / Sommet', grades: { p1: 4.5, p2: 4.2, final: 4.8 }, participationBonus: 0 },
-  { id: '4', name: 'Carlos Mario Dagua Palco', project: 'Casa Salatino / Sommet', grades: { p1: 3.2, p2: 3.8, final: 3.5 }, participationBonus: 0 },
-  { id: '5', name: 'James Andres Marin Rojas', project: 'Casa al cuadrado / Estudi La Caseta', grades: { p1: 4.8, p2: 4.9, final: 5.0 }, participationBonus: 0 },
-  { id: '6', name: 'Alvaro Andres Rodriguez Espinel', project: 'Pendiente de asignar', grades: { p1: 2.5, p2: 2.8, final: 3.0 }, participationBonus: 0 },
-  { id: '7', name: 'Karol Andrea Forero Herrera', project: 'Casa Salatino / Sommet', grades: { p1: 4.0, p2: 4.2, final: 4.3 }, participationBonus: 0 },
-  { id: '8', name: 'Alejandra Rueda Castro', project: 'Casa Jungla / FAMM Arquitectura', grades: { p1: 4.9, p2: 4.8, final: 5.0 }, participationBonus: 0 },
-  { id: '9', name: 'Julian Santiago Gonzalez Pirazan', project: 'Pendiente de asignar', grades: { p1: 3.0, p2: 3.2, final: 3.5 }, participationBonus: 0 },
-  { id: '10', name: 'Alejandra Lopez Arrubla', project: 'Casa Jungla / FAMM Arquitectura', grades: { p1: 4.1, p2: 4.3, final: 4.5 }, participationBonus: 0 },
-  { id: '11', name: 'Juan Felipe Diaz Martinez', project: 'Casa Jungla / FAMM Arquitectura', grades: { p1: 3.9, p2: 4.0, final: 4.2 }, participationBonus: 0 },
+  { id: '1', name: 'Yenifer Tatiana Arias Coca', project: 'Casa AF / Arquipélago Arquitetos', grades: { p1: 4.2, p2: 4.0, final: 4.5 }, participationBonus: 0, comment: '' },
+  { id: '2', name: 'Camilo Andres Miranda Gomez', project: 'Casa AF / Arquipélago Arquitetos', grades: { p1: 3.8, p2: 3.5, final: 4.0 }, participationBonus: 0, comment: '' },
+  { id: '3', name: 'Andres Felipe Posso Garcia', project: 'Casa Salatino / Sommet', grades: { p1: 4.5, p2: 4.2, final: 4.8 }, participationBonus: 0, comment: '' },
+  { id: '4', name: 'Carlos Mario Dagua Palco', project: 'Casa Salatino / Sommet', grades: { p1: 3.2, p2: 3.8, final: 3.5 }, participationBonus: 0, comment: '' },
+  { id: '5', name: 'James Andres Marin Rojas', project: 'Casa al cuadrado / Estudi La Caseta', grades: { p1: 4.8, p2: 4.9, final: 5.0 }, participationBonus: 0, comment: '' },
+  { id: '6', name: 'Alvaro Andres Rodriguez Espinel', project: 'Pendiente de asignar', grades: { p1: 2.5, p2: 2.8, final: 3.0 }, participationBonus: 0, comment: '' },
+  { id: '7', name: 'Karol Andrea Forero Herrera', project: 'Casa Salatino / Sommet', grades: { p1: 4.0, p2: 4.2, final: 4.3 }, participationBonus: 0, comment: '' },
+  { id: '8', name: 'Alejandra Rueda Castro', project: 'Casa Jungla / FAMM Arquitectura', grades: { p1: 4.9, p2: 4.8, final: 5.0 }, participationBonus: 0, comment: '' },
+  { id: '9', name: 'Julian Santiago Gonzalez Pirazan', project: 'Pendiente de asignar', grades: { p1: 3.0, p2: 3.2, final: 3.5 }, participationBonus: 0, comment: '' },
+  { id: '10', name: 'Alejandra Lopez Arrubla', project: 'Casa Jungla / FAMM Arquitectura', grades: { p1: 4.1, p2: 4.3, final: 4.5 }, participationBonus: 0, comment: '' },
+  { id: '11', name: 'Juan Felipe Diaz Martinez', project: 'Casa Jungla / FAMM Arquitectura', grades: { p1: 3.9, p2: 4.0, final: 4.2 }, participationBonus: 0, comment: '' },
 ];
 
 type Tab = 'student' | 'table' | 'dashboard' | 'ai';
@@ -85,6 +85,7 @@ const App: React.FC = () => {
       name: 'Nuevo Estudiante',
       project: 'Proyecto sin asignar',
       grades: BIM_DELIVERIES.reduce((acc, sub) => ({ ...acc, [sub.id]: 0 }), {}),
+      comment: 'Anotación pendiente',
     };
     setStudents([newStudent, ...students]);
   };

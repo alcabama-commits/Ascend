@@ -1,6 +1,6 @@
 import { Student } from "../types";
 
-const GOOGLE_SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbzZC-g2ijaggOswPWnyvjtDOdf5hJPVW1rYJKXj_LgPyoUh50zulRgKb6VrS7lsrPJkmQ/exec';
+const GOOGLE_SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbxVu0_hhksHZGzbz67sCZG-a8fHGeWNs59bdMTiI7vung43bsBXtF80EDemslFgTJ7VAA/exec';
 
 interface SaveResult {
   success: boolean;
