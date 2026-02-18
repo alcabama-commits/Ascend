@@ -8,9 +8,10 @@ interface StudentTableProps {
   subjects: Subject[];
   onUpdate: (id: string, updates: Partial<Student>) => void;
   onDelete: (id: string) => void;
+  readOnly?: boolean;
 }
 
-const StudentTable: React.FC<StudentTableProps> = ({ students, subjects, onUpdate, onDelete }) => {
+const StudentTable: React.FC<StudentTableProps> = ({ students, subjects, onUpdate, onDelete, readOnly = false }) => {
   const handleGradeChange = (studentId: string, subjectId: string, value: string) => {
     // Escala 0.0 a 5.0
     let score = parseFloat(value) || 0;
@@ -54,18 +55,30 @@ const StudentTable: React.FC<StudentTableProps> = ({ students, subjects, onUpdat
                         {student.name.charAt(0)}
                       </div>
                       <div className="flex flex-col gap-1 flex-1 min-w-[200px]">
-                        <input 
-                          className="bg-transparent border-none p-0 font-bold text-slate-100 focus:ring-0 w-full text-sm"
-                          value={student.name}
-                          onChange={(e) => onUpdate(student.id, { name: e.target.value })}
-                        />
+                        {readOnly ? (
+                          <div className="font-bold text-slate-100 text-sm">
+                            {student.name}
+                          </div>
+                        ) : (
+                          <input 
+                            className="bg-transparent border-none p-0 font-bold text-slate-100 focus:ring-0 w-full text-sm"
+                            value={student.name}
+                            onChange={(e) => onUpdate(student.id, { name: e.target.value })}
+                          />
+                        )}
                         <div className="flex items-center gap-2 text-[11px] text-slate-500">
                           <FolderGit2 className="w-3 h-3 text-indigo-400" />
-                          <input 
-                            className="bg-transparent border-none p-0 focus:ring-0 w-full italic"
-                            value={student.project}
-                            onChange={(e) => onUpdate(student.id, { project: e.target.value })}
-                          />
+                          {readOnly ? (
+                            <span className="italic">
+                              {student.project}
+                            </span>
+                          ) : (
+                            <input 
+                              className="bg-transparent border-none p-0 focus:ring-0 w-full italic"
+                              value={student.project}
+                              onChange={(e) => onUpdate(student.id, { project: e.target.value })}
+                            />
+                          )}
                         </div>
                       </div>
                     </div>
@@ -77,9 +90,10 @@ const StudentTable: React.FC<StudentTableProps> = ({ students, subjects, onUpdat
                         step="0.1"
                         min="0"
                         max="5"
-                        className="w-14 px-1 py-2 text-center bg-slate-800/50 border border-slate-700/50 rounded-xl text-xs font-bold text-white focus:ring-2 focus:ring-indigo-500 outline-none"
+                        className="w-14 px-1 py-2 text-center bg-slate-800/50 border border-slate-700/50 rounded-xl text-xs font-bold text-white focus:ring-2 focus:ring-indigo-500 outline-none disabled:opacity-60 disabled:cursor-not-allowed"
                         value={student.grades[subject.id] ?? 0.0}
                         onChange={(e) => handleGradeChange(student.id, subject.id, e.target.value)}
+                        disabled={readOnly}
                       />
                     </td>
                   ))}
@@ -95,12 +109,14 @@ const StudentTable: React.FC<StudentTableProps> = ({ students, subjects, onUpdat
                     </span>
                   </td>
                   <td className="px-6 py-5 text-right">
-                    <button 
-                      onClick={() => onDelete(student.id)}
-                      className="opacity-0 group-hover:opacity-100 p-2 text-slate-600 hover:text-red-400 transition-all"
-                    >
-                      <Trash2 className="w-4 h-4" />
-                    </button>
+                    {!readOnly && (
+                      <button 
+                        onClick={() => onDelete(student.id)}
+                        className="opacity-0 group-hover:opacity-100 p-2 text-slate-600 hover:text-red-400 transition-all"
+                      >
+                        <Trash2 className="w-4 h-4" />
+                      </button>
+                    )}
                   </td>
                 </tr>
               );

@@ -5,7 +5,8 @@ import {
   Plus, 
   LayoutDashboard, 
   Sparkles, 
-  Search
+  Search,
+  Shield
 } from 'lucide-react';
 import { Student, Subject } from './types';
 import StudentTable from './components/StudentTable';
@@ -33,10 +34,27 @@ const INITIAL_STUDENTS: Student[] = [
   { id: '11', name: 'Juan Felipe Diaz Martinez', project: 'Casa Jungla / FAMM Arquitectura', grades: { p1: 3.9, p2: 4.0, final: 4.2 } },
 ];
 
+type Tab = 'student' | 'table' | 'dashboard' | 'ai';
+
+const ADMIN_PASSWORD = 'Ascend2025';
+
 const App: React.FC = () => {
-  const [activeTab, setActiveTab] = useState<'table' | 'dashboard' | 'ai'>('table');
+  const [activeTab, setActiveTab] = useState<Tab>('student');
   const [students, setStudents] = useState<Student[]>(INITIAL_STUDENTS);
   const [searchTerm, setSearchTerm] = useState('');
+  const [adminAuthenticated, setAdminAuthenticated] = useState(false);
+
+  const handleAdminTabClick = (tab: Tab) => {
+    if (!adminAuthenticated) {
+      const input = window.prompt('Introduce la contraseña de administración');
+      if (input !== ADMIN_PASSWORD) {
+        window.alert('Contraseña incorrecta');
+        return;
+      }
+      setAdminAuthenticated(true);
+    }
+    setActiveTab(tab);
+  };
 
   const addStudent = () => {
     const newStudent: Student = {
@@ -82,20 +100,26 @@ const App: React.FC = () => {
 
         <nav className="flex-1 p-6 space-y-3">
           <NavItem 
-            active={activeTab === 'table'} 
-            onClick={() => setActiveTab('table')}
+            active={activeTab === 'student'} 
+            onClick={() => setActiveTab('student')}
             icon={<Users className="w-5 h-5" />}
-            label="Entregas"
+            label="Vista estudiantes"
+          />
+          <NavItem 
+            active={activeTab === 'table'} 
+            onClick={() => handleAdminTabClick('table')}
+            icon={<Shield className="w-5 h-5" />}
+            label="Administración"
           />
           <NavItem 
             active={activeTab === 'dashboard'} 
-            onClick={() => setActiveTab('dashboard')}
+            onClick={() => handleAdminTabClick('dashboard')}
             icon={<LayoutDashboard className="w-5 h-5" />}
             label="Analítica"
           />
           <NavItem 
             active={activeTab === 'ai'} 
-            onClick={() => setActiveTab('ai')}
+            onClick={() => handleAdminTabClick('ai')}
             icon={<Sparkles className="w-5 h-5" />}
             label="Mentor IA"
             special
@@ -127,16 +151,34 @@ const App: React.FC = () => {
             />
           </div>
 
-          <button 
-            onClick={addStudent}
-            className="group relative flex items-center gap-2 px-6 py-3 bg-white text-black rounded-2xl hover:bg-slate-100 shadow-lg transition-all text-sm font-bold overflow-hidden"
-          >
-            <Plus className="w-4 h-4" />
-            <span>Añadir Alumno</span>
-          </button>
+          {activeTab !== 'student' && (
+            <button 
+              onClick={addStudent}
+              className="group relative flex items-center gap-2 px-6 py-3 bg-white text-black rounded-2xl hover:bg-slate-100 shadow-lg transition-all text-sm font-bold overflow-hidden"
+            >
+              <Plus className="w-4 h-4" />
+              <span>Añadir Alumno</span>
+            </button>
+          )}
         </header>
 
         <div className="p-8 max-w-7xl mx-auto w-full">
+          {activeTab === 'student' && (
+            <div className="animate-in fade-in duration-500">
+              <div className="mb-8">
+                <h2 className="text-3xl font-extrabold text-white tracking-tight">Vista de estudiantes</h2>
+                <p className="text-slate-500 mt-1">Consulta de calificaciones en modo solo lectura.</p>
+              </div>
+              <StudentTable 
+                students={filteredStudents} 
+                subjects={BIM_DELIVERIES} 
+                onUpdate={updateStudent} 
+                onDelete={deleteStudent}
+                readOnly
+              />
+            </div>
+          )}
+
           {activeTab === 'table' && (
             <div className="animate-in fade-in duration-500">
               <div className="mb-8">
@@ -147,7 +189,7 @@ const App: React.FC = () => {
                 students={filteredStudents} 
                 subjects={BIM_DELIVERIES} 
                 onUpdate={updateStudent} 
-                onDelete={deleteStudent} 
+                onDelete={deleteStudent}
               />
             </div>
           )}
