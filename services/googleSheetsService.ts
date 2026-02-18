@@ -1,6 +1,6 @@
 import { Student } from "../types";
 
-const GOOGLE_SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbxy23OBwu8zl3qBkyF8_Kqjsr8S6TnfDnfaKHWKk8BswBLUGyeDiZIT9WOGmoPIOPL-Bg/exec';
+const GOOGLE_SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbxCDY82cQx2h8HgS-TDlGUvcb_0XzoUQj3YgonbSPffL_AVpVUCPS0dQDLzwWmRjH4apA/exec';
 
 interface SaveResult {
   success: boolean;
@@ -16,7 +16,7 @@ export const saveStudentsToSheet = async (students: Student[]): Promise<SaveResu
   try {
     await fetch(GOOGLE_SCRIPT_URL, {
       method: "POST",
-      mode: "no-cors",
+      mode: "no-cors", // ADVERTENCIA: 'no-cors' previene leer la respuesta del servidor. La app asume que el guardado fue exitoso.
       body: JSON.stringify(students),
     });
 
@@ -24,5 +24,33 @@ export const saveStudentsToSheet = async (students: Student[]): Promise<SaveResu
   } catch (error) {
     console.error("Error guardando en Sheets:", error);
     return { success: false, message: String(error) };
+  }
+};
+
+export const getStudentsFromSheet = async (): Promise<Student[]> => {
+  if (!GOOGLE_SCRIPT_URL) {
+    console.error("Falta configurar la URL del Script de Google");
+    return [];
+  }
+
+  try {
+    const response = await fetch(GOOGLE_SCRIPT_URL);
+
+    if (!response.ok) {
+      throw new Error(`Error en la red al obtener datos: ${response.statusText}`);
+    }
+
+    const data = await response.json();
+    
+    // Validamos que la respuesta sea un array para evitar errores en la app
+    if (!Array.isArray(data)) {
+      console.error("La respuesta de Google Sheets no es un array válido:", data);
+      return [];
+    }
+
+    return data as Student[];
+  } catch (error) {
+    console.error("Error obteniendo datos de Sheets:", error);
+    return []; // Devolver un array vacío en caso de error para no romper la UI
   }
 };

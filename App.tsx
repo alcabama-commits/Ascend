@@ -1,5 +1,5 @@
 
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { 
   Users, 
   Plus, 
@@ -14,7 +14,7 @@ import { Student, Subject } from './types';
 import StudentTable from './components/StudentTable';
 import Dashboard from './components/Dashboard';
 import AIPanel from './components/AIPanel';
-import { saveStudentsToSheet } from './services/googleSheetsService';
+import { saveStudentsToSheet, getStudentsFromSheet } from './services/googleSheetsService';
 
 // Definición de las 3 entregas principales
 const BIM_DELIVERIES: Subject[] = [
@@ -43,10 +43,29 @@ const ADMIN_PASSWORD = 'Ascend2025';
 
 const App: React.FC = () => {
   const [activeTab, setActiveTab] = useState<Tab>('student');
-  const [students, setStudents] = useState<Student[]>(INITIAL_STUDENTS);
+  const [students, setStudents] = useState<Student[]>([]);
   const [searchTerm, setSearchTerm] = useState('');
   const [adminAuthenticated, setAdminAuthenticated] = useState(false);
   const [isSaving, setIsSaving] = useState(false);
+  const [isLoading, setIsLoading] = useState(true);
+
+  useEffect(() => {
+    const loadInitialData = async () => {
+      setIsLoading(true);
+      const dataFromSheet = await getStudentsFromSheet();
+
+      if (dataFromSheet && dataFromSheet.length > 0) {
+        setStudents(dataFromSheet);
+      } else {
+        // Si la hoja está vacía o hay un error, carga los datos iniciales de ejemplo.
+        // Puedes cambiar esto para que muestre un error o se quede vacío.
+        setStudents(INITIAL_STUDENTS);
+        console.warn("No se cargaron datos de Google Sheets. Usando datos de ejemplo locales.");
+      }
+      setIsLoading(false);
+    };
+    loadInitialData();
+  }, []); // El array vacío asegura que se ejecute solo una vez al montar el componente
 
   const handleAdminTabClick = (tab: Tab) => {
     if (!adminAuthenticated) {
@@ -98,6 +117,15 @@ const App: React.FC = () => {
       alert('Error al guardar: ' + (result.message || 'Verifica la consola'));
     }
   };
+
+  if (isLoading) {
+    return (
+      <div className="min-h-screen flex flex-col justify-center items-center bg-[#020617] text-slate-200">
+        <Loader2 className="w-12 h-12 animate-spin text-indigo-500" />
+        <p className="mt-4 text-lg">Sincronizando con la nube...</p>
+      </div>
+    );
+  }
 
   return (
     <div className="min-h-screen flex flex-col md:flex-row bg-[#020617] text-slate-200">
