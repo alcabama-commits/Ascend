@@ -38,18 +38,19 @@ const Dashboard: React.FC<DashboardProps> = ({ students, subjects }) => {
       const weight = WEIGHTS[subject.id] ?? 0;
       if (weight === 0) return;
 
-      let grade = student.grades[subject.id] ?? 0;
-      if (subject.id === 'final') {
-        const bonus = student.participationBonus ?? 0;
-        grade = Math.min(5.0, grade + bonus);
-      }
+      const grade = student.grades[subject.id] ?? 0;
 
       total += grade * weight;
       weightSum += weight;
     });
 
     if (weightSum === 0) return 0;
-    return total / weightSum;
+
+    const baseAverage = total / weightSum;
+    const bonus = student.participationBonus ?? 0;
+    const finalAverage = Math.min(5.0, baseAverage + bonus);
+
+    return finalAverage;
   };
 
   const chartData = useMemo(() => {

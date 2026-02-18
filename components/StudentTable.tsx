@@ -36,19 +36,19 @@ const StudentTable: React.FC<StudentTableProps> = ({ students, subjects, onUpdat
       const weight = WEIGHTS[subject.id] ?? 0;
       if (weight === 0) return;
 
-      let grade = student.grades[subject.id] ?? 0;
-
-      if (subject.id === 'final') {
-        const bonus = student.participationBonus ?? 0;
-        grade = Math.min(5.0, grade + bonus);
-      }
+      const grade = student.grades[subject.id] ?? 0;
 
       total += grade * weight;
       weightSum += weight;
     });
 
     if (weightSum === 0) return "0.0";
-    return (total / weightSum).toFixed(1);
+
+    const baseAverage = total / weightSum;
+    const bonus = student.participationBonus ?? 0;
+    const finalAverage = Math.min(5.0, baseAverage + bonus);
+
+    return finalAverage.toFixed(1);
   };
 
   return (
