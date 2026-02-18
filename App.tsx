@@ -1,5 +1,5 @@
 
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { 
   Users, 
   Plus, 
@@ -14,7 +14,7 @@ import { Student, Subject } from './types';
 import StudentTable from './components/StudentTable';
 import Dashboard from './components/Dashboard';
 import AIPanel from './components/AIPanel';
-import { saveStudentsToSheet } from './services/googleSheetsService';
+import { saveStudentsToSheet, fetchStudentsFromSheet } from './services/googleSheetsService';
 
 // Definición de las 3 entregas principales
 const BIM_DELIVERIES: Subject[] = [
@@ -47,6 +47,7 @@ const App: React.FC = () => {
   const [searchTerm, setSearchTerm] = useState('');
   const [adminAuthenticated, setAdminAuthenticated] = useState(false);
   const [isSaving, setIsSaving] = useState(false);
+  const [isLoadingFromSheet, setIsLoadingFromSheet] = useState(false);
 
   const handleAdminTabClick = (tab: Tab) => {
     if (!adminAuthenticated) {
@@ -84,6 +85,18 @@ const App: React.FC = () => {
     s.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
     s.project.toLowerCase().includes(searchTerm.toLowerCase())
   );
+
+  useEffect(() => {
+    const loadFromSheet = async () => {
+      setIsLoadingFromSheet(true);
+      const result = await fetchStudentsFromSheet();
+      setIsLoadingFromSheet(false);
+      if (result.success && result.data && result.data.length > 0) {
+        setStudents(result.data);
+      }
+    };
+    loadFromSheet();
+  }, []);
 
   const handleSaveToCloud = async () => {
     if (!window.confirm('¿Sincronizar datos actuales con Google Sheets? Esto sobrescribirá la hoja.')) return;

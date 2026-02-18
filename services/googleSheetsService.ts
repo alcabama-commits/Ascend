@@ -7,6 +7,12 @@ interface SaveResult {
   message?: string;
 }
 
+interface LoadResult {
+  success: boolean;
+  data?: Student[];
+  message?: string;
+}
+
 export const saveStudentsToSheet = async (students: Student[]): Promise<SaveResult> => {
   if (!GOOGLE_SCRIPT_URL) {
     console.error("Falta configurar la URL del Script de Google");
@@ -23,6 +29,25 @@ export const saveStudentsToSheet = async (students: Student[]): Promise<SaveResu
     return { success: true };
   } catch (error) {
     console.error("Error guardando en Sheets:", error);
+    return { success: false, message: String(error) };
+  }
+};
+
+export const fetchStudentsFromSheet = async (): Promise<LoadResult> => {
+  if (!GOOGLE_SCRIPT_URL) {
+    console.error("Falta configurar la URL del Script de Google");
+    return { success: false, message: "URL de Google Apps Script no configurada" };
+  }
+
+  try {
+    const response = await fetch(`${GOOGLE_SCRIPT_URL}?mode=read`);
+    if (!response.ok) {
+      throw new Error("Error en la red al leer Google Sheets");
+    }
+    const data = await response.json() as Student[];
+    return { success: true, data };
+  } catch (error) {
+    console.error("Error leyendo desde Sheets:", error);
     return { success: false, message: String(error) };
   }
 };
