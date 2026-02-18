@@ -160,15 +160,17 @@ const App: React.FC = () => {
             />
           </div>
 
-          {/* Botón de Guardar en Nube (Solo visible para admin o siempre visible según prefieras) */}
-          <button 
-            onClick={handleSaveToCloud}
-            disabled={isSaving}
-            className="flex items-center gap-2 px-4 py-3 bg-[#0f8a5f] text-white rounded-2xl hover:bg-[#0b6e4b] transition-all text-sm font-bold shadow-lg shadow-green-900/20 disabled:opacity-50 disabled:cursor-not-allowed"
-          >
-            {isSaving ? <Loader2 className="w-4 h-4 animate-spin" /> : <Save className="w-4 h-4" />}
-            <span>{isSaving ? 'Guardando...' : 'Guardar en Drive'}</span>
-          </button>
+          {/* Botón de Subir notas (solo en Administración) */}
+          {activeTab === 'table' && (
+            <button 
+              onClick={handleSaveToCloud}
+              disabled={isSaving}
+              className="flex items-center gap-2 px-4 py-3 bg-yellow-500 text-black rounded-2xl hover:bg-yellow-400 transition-all text-sm font-bold shadow-lg shadow-yellow-500/20 disabled:opacity-50 disabled:cursor-not-allowed"
+            >
+              {isSaving ? <Loader2 className="w-4 h-4 animate-spin" /> : <Save className="w-4 h-4" />}
+              <span>{isSaving ? 'Subiendo...' : 'Subir notas'}</span>
+            </button>
+          )}
 
           {activeTab !== 'student' && (
             <button 

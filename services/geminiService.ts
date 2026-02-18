@@ -9,6 +9,7 @@ export const getAIInsights = async (student: Student, subjects: Subject[]) => {
   }
 
   const ai = new GoogleGenAI({ apiKey });
+  const model = ai.getGenerativeModel({ model: "gemini-1.5-flash" });
   
   const gradesList = subjects.map(s => `${s.name}: ${student.grades[s.id] || 0.0}`).join(', ');
   
@@ -29,14 +30,8 @@ export const getAIInsights = async (student: Student, subjects: Subject[]) => {
   `;
 
   try {
-    const response: any = await ai.models.generateContent({
-      model: "gemini-3-pro-preview",
-      contents: prompt,
-    });
-    if (typeof response.text === 'function') {
-      return response.text();
-    }
-    return String(response.text ?? '');
+    const result = await model.generateContent(prompt);
+    return result.response.text();
   } catch (error) {
     console.error("Error AI:", error);
     return "No pudimos generar el análisis técnico. Revisa la conexión.";
@@ -50,6 +45,7 @@ export const getClassReport = async (students: Student[], subjects: Subject[]) =
   }
 
   const ai = new GoogleGenAI({ apiKey });
+  const model = ai.getGenerativeModel({ model: "gemini-1.5-flash" });
   
   const dataSummary = students.map(st => {
     const grades = subjects.map(s => `${s.name}: ${st.grades[s.id] || 0.0}`).join(', ');
@@ -67,14 +63,8 @@ export const getClassReport = async (students: Student[], subjects: Subject[]) =
   `;
 
   try {
-    const response: any = await ai.models.generateContent({
-      model: "gemini-3-pro-preview",
-      contents: prompt,
-    });
-    if (typeof response.text === 'function') {
-      return response.text();
-    }
-    return String(response.text ?? '');
+    const result = await model.generateContent(prompt);
+    return result.response.text();
   } catch (error) {
     return "Error al procesar el reporte grupal.";
   }
