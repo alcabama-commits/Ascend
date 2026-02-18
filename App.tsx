@@ -6,12 +6,15 @@ import {
   LayoutDashboard, 
   Sparkles, 
   Search,
-  Shield
+  Shield,
+  Save,
+  Loader2
 } from 'lucide-react';
 import { Student, Subject } from './types';
 import StudentTable from './components/StudentTable';
 import Dashboard from './components/Dashboard';
 import AIPanel from './components/AIPanel';
+import { saveStudentsToSheet } from './services/googleSheetsService';
 
 // Definición de las 3 entregas principales
 const BIM_DELIVERIES: Subject[] = [
@@ -43,6 +46,7 @@ const App: React.FC = () => {
   const [students, setStudents] = useState<Student[]>(INITIAL_STUDENTS);
   const [searchTerm, setSearchTerm] = useState('');
   const [adminAuthenticated, setAdminAuthenticated] = useState(false);
+  const [isSaving, setIsSaving] = useState(false);
 
   const handleAdminTabClick = (tab: Tab) => {
     if (!adminAuthenticated) {
@@ -80,6 +84,20 @@ const App: React.FC = () => {
     s.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
     s.project.toLowerCase().includes(searchTerm.toLowerCase())
   );
+
+  const handleSaveToCloud = async () => {
+    if (!window.confirm('¿Sincronizar datos actuales con Google Sheets? Esto sobrescribirá la hoja.')) return;
+    
+    setIsSaving(true);
+    const result = await saveStudentsToSheet(students);
+    setIsSaving(false);
+
+    if (result.success) {
+      alert('¡Datos sincronizados correctamente con la nube!');
+    } else {
+      alert('Error al guardar: ' + (result.message || 'Verifica la consola'));
+    }
+  };
 
   return (
     <div className="min-h-screen flex flex-col md:flex-row bg-[#020617] text-slate-200">
@@ -141,6 +159,16 @@ const App: React.FC = () => {
               className="w-full pl-11 pr-4 py-3 bg-slate-900/50 border border-slate-800 rounded-2xl text-sm focus:ring-2 focus:ring-indigo-500 focus:bg-slate-900 transition-all text-white outline-none"
             />
           </div>
+
+          {/* Botón de Guardar en Nube (Solo visible para admin o siempre visible según prefieras) */}
+          <button 
+            onClick={handleSaveToCloud}
+            disabled={isSaving}
+            className="flex items-center gap-2 px-4 py-3 bg-[#0f8a5f] text-white rounded-2xl hover:bg-[#0b6e4b] transition-all text-sm font-bold shadow-lg shadow-green-900/20 disabled:opacity-50 disabled:cursor-not-allowed"
+          >
+            {isSaving ? <Loader2 className="w-4 h-4 animate-spin" /> : <Save className="w-4 h-4" />}
+            <span>{isSaving ? 'Guardando...' : 'Guardar en Drive'}</span>
+          </button>
 
           {activeTab !== 'student' && (
             <button 
