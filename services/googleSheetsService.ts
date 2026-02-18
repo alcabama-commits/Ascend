@@ -14,17 +14,11 @@ export const saveStudentsToSheet = async (students: Student[]): Promise<SaveResu
   }
 
   try {
-    const response = await fetch(GOOGLE_SCRIPT_URL, {
+    await fetch(GOOGLE_SCRIPT_URL, {
       method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-      },
+      mode: "no-cors",
       body: JSON.stringify(students),
     });
-
-    if (!response.ok) {
-      throw new Error("Error en la red al conectar con Google Sheets");
-    }
 
     return { success: true };
   } catch (error) {
@@ -32,4 +26,3 @@ export const saveStudentsToSheet = async (students: Student[]): Promise<SaveResu
     return { success: false, message: String(error) };
   }
 };
-
