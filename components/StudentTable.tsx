@@ -64,6 +64,7 @@ const StudentTable: React.FC<StudentTableProps> = ({ students, subjects, onUpdat
                 </th>
               ))}
               <th className="px-6 py-5 text-[10px] font-black text-slate-500 uppercase tracking-[0.2em] text-center">Participación</th>
+              <th className="px-6 py-5 text-[10px] font-black text-slate-500 uppercase tracking-[0.2em] text-left">Anotaciones</th>
               <th className="px-6 py-5 text-[10px] font-black text-slate-500 uppercase tracking-[0.2em] text-center">Promedio</th>
               <th className="px-6 py-5 text-right"></th>
             </tr>
@@ -139,6 +140,20 @@ const StudentTable: React.FC<StudentTableProps> = ({ students, subjects, onUpdat
                           const clamped = Math.max(0, Math.min(1, raw));
                           onUpdate(student.id, { participationBonus: clamped });
                         }}
+                      />
+                    )}
+                  </td>
+                  <td className="px-6 py-5">
+                    {readOnly ? (
+                      <div className="text-xs text-slate-300 max-w-xs whitespace-pre-line">
+                        {student.comment && student.comment.trim().length > 0 ? student.comment : '—'}
+                      </div>
+                    ) : (
+                      <textarea
+                        className="w-full px-3 py-2 text-xs bg-slate-800/50 border border-slate-700/50 rounded-xl text-slate-100 focus:ring-2 focus:ring-indigo-500 outline-none resize-none"
+                        rows={2}
+                        value={student.comment ?? ''}
+                        onChange={(e) => onUpdate(student.id, { comment: e.target.value })}
                       />
                     )}
                   </td>
